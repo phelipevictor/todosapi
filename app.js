@@ -1,28 +1,19 @@
-import express from 'express';
-const PORT = 5005
+const express = require('express');
+const connectDb = require('./config/db.config.js');
+const morgan = require('morgan')
+require('dotenv').config();
 
-import './db/index.js'
-
+connectDb()
 const app = express()
-
 app.use(express.json())
+app.use(morgan('dev'))
 
-app.get('/todos', (req, res) => {
-    res.send('Get all Todos form DB')
+app.get('/', (req, res) => {
+    res.send('Tá funcionando')
 })
 
-import Todo from './models/todo.js'
+app.use('/todos', require('./routes/todos.routes.js'))
 
-app.post('/todos', async (req, res) => {
-    const { body } = req
-    try {
-    const newTodo = await Todo.create(body)
-    res.status(201).json(newTodo)
-    } catch (error) {
-    res.status(400).json({ status: 400, msg: error.message })
-    }
-})
-
-app.listen(PORT, () => {
-    console.log(`Server Running on http://localhost:${PORT} port`)
+app.listen(process.env.PORT, () => {
+    console.log(`Server listen on Port ${process.env.PORT}`)
 })
